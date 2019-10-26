@@ -11,7 +11,7 @@ class objeto {
         var difx = Math.abs(this.x - obj.x);
         var dify = Math.abs(this.y - obj.y);
 
-        if(difx >= 0 && defx < tamano && dify >= 0 && dify < tamano){
+        if(difx >= 0 && difx < tamano && dify >= 0 && dify < tamano){
             return true;
         }
         return false;
@@ -34,11 +34,31 @@ class Cola extends objeto {
         this.x = x;
         this.y = y;
     }
+}
 
+class Comida extends objeto {
+    constructor(){
+        super();
+        this.x = this.generar();
+        this.y = this.generar();
+    }
+    generar (){
+        var num = (Math.floor(Math.random() * 59)) * tamano;
+        return num;
+    }
+    colocar(){
+        this.x = this.generar();
+        this.y = this.generar();
+    }
+    dibujar(contexto){
+        contexto.fillStyle = "#FF0000";
+        contexto.fillRect(this.x, this.y, this.tamano, this.tamano);
+    }
 }
 
 // Objetos del juego
 var cabeza =  new Cola(20,20);
+var comida = new Comida();
 var ejex = true;
 var ejey = true;
 var xdir = 0;
@@ -89,13 +109,16 @@ function dibujar () {
     // Aqui va todo el dbujo
     // contexto.fillRect(10, 10, 100, 100);
     cabeza.dibujar(contexto);
+    comida.dibujar(contexto);
 }
 
 // Funcion de renderizado
 function main() {
     dibujar();
     movimiento();
-
+    if(cabeza.choque(comida)){
+        comida.colocar();
+    }
 }
 setInterval("main()", velocidad);
 
