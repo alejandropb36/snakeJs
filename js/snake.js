@@ -23,16 +23,36 @@ class Cola extends objeto {
         super();
         this.x = x;
         this.y = y;
+        this.siguiente = null;
     }
 
     dibujar(contexto) {
+        if(this.siguiente != null){
+            this.siguiente.dibujar(contexto);
+        }
         contexto.fillStyle = "#0000FF";
         contexto.fillRect(this.x, this.y, this.tamano, this.tamano);
     }
 
     setxy(x, y){
+        if(this.siguiente != null){
+            this.siguiente.setxy(this.x, this.y);
+        }
         this.x = x;
         this.y = y;
+    }
+
+    meter(){
+        if(this.siguiente == null){
+            this.siguiente = new Cola(this.x, this.y);
+        }
+        else{
+            this.siguiente.meter();
+        }
+    }
+
+    getSiguiete(){
+        return this.siguiente;
     }
 }
 
@@ -102,6 +122,41 @@ function control(event) {
     }
 }
 
+function gameover(){
+    xdir = 0;
+    ydir = 0;
+    ejex = true;
+    ejey = true;
+    cabeza = new Cola(tamano, tamano);
+    comida = new Comida();
+    alert("Game Over :(");
+}
+
+function choquepared(){
+    if(cabeza.x < 0 || cabeza.x > 590 || cabeza.y < 0 || cabeza.y > 590){
+        gameover();
+    }
+}
+
+function choquecuerpo(){
+    var temp = null;
+    try{
+        temp = cabeza.getSiguiete().getSiguiete();
+    }
+    catch(error){
+        temp = null;
+    }
+    while(temp != null){
+        if(cabeza.choque(temp)){
+            // fin de juego
+            gameover();
+        }
+        else{
+            temp = temp.getSiguiete();
+        }
+    }
+}
+
 function dibujar () {
     var canvas = document.getElementById("workspace");
     var contexto = canvas.getContext("2d");
@@ -114,10 +169,13 @@ function dibujar () {
 
 // Funcion de renderizado
 function main() {
+    choquecuerpo();
+    choquepared();
     dibujar();
     movimiento();
     if(cabeza.choque(comida)){
         comida.colocar();
+        cabeza.meter();
     }
 }
 setInterval("main()", velocidad);
